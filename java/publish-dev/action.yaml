@@ -37,6 +37,7 @@ runs:
         gradle-executable: "${{ inputs.root-directory }}/gradlew"
 
     - name: "Set executable permission for Gradle wrapper"
+      shell: bash
       run: |
         chmod +x "${{ inputs.root-directory }}/gradlew"
       working-directory: "${{ inputs.root-directory }}/gradle/wrapper"
