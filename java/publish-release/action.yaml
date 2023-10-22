@@ -1,0 +1,48 @@
+name: "mvn-publish-dev"
+description: "Build and publish a project to the release repository."
+author: "Steamworks"
+
+inputs:
+  publish-task:
+    description: "The task to publish the package"
+    default: "publishMavenPublicationToReleaseRepository"
+  root-directory:
+    description: "The path to the root directory of the project."
+    default: "."
+  maven-username:
+    description: "The username to use when authenticating with the repository."
+  maven-password:
+    description: "The password to pair with the username when authenticating with the repository."
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout Repository"
+      uses: "actions/checkout@v4"
+
+    - name: "Get Commit Hash"
+      id: "commit"
+      uses: "pr-mpt/actions-commit-hash@v2"
+
+    - name: "Setup Java"
+      uses: "actions/setup-java@v3"
+      with:
+        java-version: "21"
+        distribution: "zulu"
+
+    - name: "Validate Gradle Wrapper"
+      uses: "gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b"
+      with:
+        wrapper-directory: "${{ inputs.root-directory }}/gradle/wrapper"
+        gradle-executable: "${{ inputs.root-directory }}/gradlew"
+
+    - name: "Publish package"
+      uses: "gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1"
+      with:
+        arguments: "${{ inputs.publish-task }}"
+        build-root-directory: "${{ inputs.root-directory }}"
+      env:
+        MAVEN_USERNAME: "${{ inputs.maven-username }}"
+        MAVEN_SECRET: "${{ inputs.maven-password }}"
+        COMMIT_HASH: "${{ steps.commit.outputs.hash }}"
+        COMMIT_HASH_SHORT: "${{ steps.commit.outputs.short }}"
