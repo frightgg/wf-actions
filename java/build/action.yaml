@@ -1,0 +1,68 @@
+name: "java-build"
+description: "Builds a project's 'Dockerfile' and pushes the resulting Docker image to the registry."
+author: "Steamworks"
+
+inputs:
+  gradle-command:
+    description: "The command executed by Gradle to build the project"
+    default: "./gradlew clean shadowJar --no-daemon"
+  dockerfile-path:
+    description: "The relative path to the Dockerfile from the project root"
+    default: "./Dockerfile"
+  java-version:
+    description: "The Java version to build with"
+    default: "20"
+  java-distribution:
+    description: "The Java version to build with"
+    default: "zulu"
+  token:
+    description: "The GitHub token used to push the Docker image to the registry"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout"
+      uses: "actions/checkout@v4"
+
+    - name: "Validate Gradle Wrapper"
+      uses: "gradle/wrapper-validation-action@v1"
+
+    - name: "Set up JDK"
+      uses: "actions/setup-java@v3"
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.java-distribution }}
+
+    - name: "Setup Gradle"
+      uses: "gradle/gradle-build-action@v2"
+
+    - name: "Build with Gradle"
+      shell: "bash"
+      run: "${{ inputs.gradle-command }}"
+
+    # Identifies if the branch is main or not and therefore whether we should tag the image as latest
+    # Creates the tags for use later (either hash or latest and hash)
+    - name: "Identify Environment"
+      uses: "frightgg/wf-actions/identify-environment-v1@main" # Outputs DOCKER_TAGS
+
+    - name: "Login to container registry"
+      uses: "docker/login-action@v2"
+      with:
+        registry: "ghcr.io"
+        username: "${{ github.actor }}"
+        password: "${{ inputs.token }}"
+
+    - name: "Set up Docker Buildx"
+      uses: "docker/setup-buildx-action@v2"
+      with:
+        platforms: linux/amd64, linux/arm64
+
+    - name: "Build and push"
+      uses: "docker/build-push-action@v3"
+      with:
+        context: "."
+        file: "./Dockerfile"
+        push: true
+        platforms: linux/amd64, linux/arm64
+        tags: ${{ env.DOCKER_TAGS }}
