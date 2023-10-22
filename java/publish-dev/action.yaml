@@ -40,7 +40,6 @@ runs:
       shell: bash
       run: |
         chmod +x "${{ inputs.root-directory }}/gradlew"
-      working-directory: "${{ inputs.root-directory }}/gradle/wrapper"
 
     - name: "Publish package"
       uses: "gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1"
