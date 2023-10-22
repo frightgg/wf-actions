@@ -47,7 +47,7 @@ runs:
       uses: "frightgg/wf-actions/identify-environment-v1@main" # Outputs DOCKER_TAGS
 
     - name: "Login to container registry"
-      uses: "docker/login-action@v2"
+      uses: "docker/login-action@v3"
       with:
         registry: "ghcr.io"
         username: "${{ github.actor }}"
