@@ -1,0 +1,30 @@
+name: "identify-environment-v1"
+description: "Identifies the environment for building a docker image and exports the tags to use."
+author: "Steamworks"
+
+inputs:
+  registry-address:
+    description: "The address of the container registry"
+    default: "ghcr.io"
+  env-output:
+    description: "The name of the environment variable to output the tags to"
+    default: "DOCKER_TAGS"
+
+runs:
+  using: "composite"
+  steps:
+    # Identifies if the branch is main or not and therefore whether we should tag the image as latest
+    # Creates the tags for use later (either hash or latest and hash)
+    - name: "Identify Environment"
+      shell: bash
+      run: |
+        tag_prefix="${{ inputs.registry-address }}/${{ github.repository }}"
+        tags=""
+
+        if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+          tags="$tag_prefix:${{ github.sha }},$tag_prefix:latest"
+        elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          tags="$tag_prefix:pr-${{ github.event.number }},$tag_prefix:${{github.event.pull_request.head.sha}}"
+        fi
+
+        echo "${{ inputs.env-output }}=$tags" >> "$GITHUB_ENV"
