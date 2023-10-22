@@ -30,6 +30,11 @@ runs:
         java-version: "21"
         distribution: "zulu"
 
+    - name: "Set executable permission for gradlew"
+      run: |
+        chmod +x {{ inputs.root-directory }}/gradlew
+      working-directory: "{{ inputs.root-directory }}"
+
     - name: "Validate Gradle Wrapper"
       uses: "gradle/wrapper-validation-action@e6e38bacfdf1a337459f332974bb2327a31aaf4b"
       with:
