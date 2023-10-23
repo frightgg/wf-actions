@@ -22,7 +22,7 @@ runs:
 
     - name: "Get Commit Hash"
       id: "commit"
-      uses: "pr-mpt/actions-commit-hash@v2"
+      uses: "pr-mpt/actions-commit-hash@v3"
 
     - name: "Setup Java"
       uses: "actions/setup-java@v3"
