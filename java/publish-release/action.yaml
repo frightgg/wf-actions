@@ -25,7 +25,7 @@ runs:
       uses: "pr-mpt/actions-commit-hash@v2"
 
     - name: "Setup Java"
-      uses: "actions/setup-java@v3"
+      uses: "actions/setup-java@v4"
       with:
         java-version: "21"
         distribution: "zulu"
