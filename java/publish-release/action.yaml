@@ -37,7 +37,7 @@ runs:
         gradle-executable: "${{ inputs.root-directory }}/gradlew"
 
     - name: "Publish package"
-      uses: "gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1"
+      uses: "gradle/gradle-build-action@32bab5b15a50e1b08ae1565fc18471b42da9665b"
       with:
         arguments: "${{ inputs.publish-task }}"
         build-root-directory: "${{ inputs.root-directory }}"
